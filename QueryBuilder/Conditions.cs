@@ -15,13 +15,41 @@ namespace QueryBuilder
         public static Condition operator !(Condition condition) =>
             Conditions.Not(condition);
 
-        public abstract void Generate(IQueryGenerator visitor);
+        // Here, we want to support || and && syntax, but build complete 
+        // SQL conditions without shortcut. So we always return false.
+        // Otherwise you could match on the following True and False literals.
+        public static bool operator true(Condition _cond) => false;
+        public static bool operator false(Condition _cond) => false;
+
+        public static Condition True { get; } = new Literal("TRUE");
+        public static Condition False { get; } = new Literal("FALSE");
+
+        public static implicit operator Condition(bool value) => value ? True : False;
+
+
+        public abstract void Generate(IQueryGenerator generator);
 
         public override string ToString()
         {
-            var visitor = new SimpleSqlGenerator();
-            Generate(visitor);
-            return visitor.ToString();
+            var generator = new SimpleSqlGenerator();
+            Generate(generator);
+            return generator.ToString();
+        }
+
+        // Internal class representing condition literals, esp. TRUE and FALSE
+        private class Literal : Condition
+        {
+            private string _literal;
+            public Literal(string Literal)
+            {
+                _literal = Literal;
+            }
+
+            public override void Generate(IQueryGenerator generator)
+            {
+                generator.Append(_literal);
+            }
+
         }
     }
 

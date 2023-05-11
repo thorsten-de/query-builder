@@ -57,7 +57,7 @@ public class ConditionTests
     [Fact]
     public void Equals_builds_sql_expression()
     {
-        string expected = "col1 == col2";
+        string expected = "col1 = col2";
         var e = t["col1"] == t["col2"];
         var sql = Generate(e);
         Assert.Equal(expected, sql);
@@ -75,7 +75,7 @@ public class ConditionTests
     [Fact]
     public void Not_operator_composes_condition()
     {
-        string expected = "NOT col == 5";
+        string expected = "NOT col = 5";
         var e = !(t["col"] == 5);
 
         var sql = Generate(e);
@@ -86,8 +86,8 @@ public class ConditionTests
     [Fact]
     public void And_operator_composes_two_conditions()
     {
-        string expected = "(5 == t1.col AND 4 != t2.col)";
-        var e = (5 == t["col", "t1"]) & (4 != t["col", "t2"]);
+        string expected = "(5 = t1.col AND 4 != t2.col)";
+        var e = (5 == t["col", "t1"]) && (4 != t["col", "t2"]);
 
         var sql = Generate(e);
         Assert.Equal(expected, sql);
@@ -96,8 +96,8 @@ public class ConditionTests
     [Fact]
     public void Or_operator_composes_two_conditions()
     {
-        string expected = "(col == 5 OR col != t2.col3)";
-        var e = (t["col"] == 5) | (t["col"] != t["t2.col3"]);
+        string expected = "(col = 5 OR col != t2.col3)";
+        var e = (t["col"] == 5) || (t["col"] != t["col3", "t2"]);
 
         var sql = Generate(e);
         Assert.Equal(expected, sql);
@@ -106,7 +106,7 @@ public class ConditionTests
     [Fact]
     public void And_operator_handles_many_conditions()
     {
-        string expected = "(c1 == 5 AND c2 == 3 AND c3 == 3 AND c4 == 4)";
+        string expected = "(c1 = 5 AND c2 = 3 AND c3 = 3 AND c4 = 4)";
 
         var e = And(t["c1"] == 5, t["c2"] == 3, t["c3"] == 3, t["c4"] == 4);
 
@@ -116,7 +116,7 @@ public class ConditionTests
     [Fact]
     public void Or_operator_composes_one_condition()
     {
-        string expected = "c == 1";
+        string expected = "c = 1";
         var e = Or(t["c"] == 1);
 
         var sql = Generate(e);
@@ -136,9 +136,9 @@ public class ConditionTests
     [Fact]
     public void Compose_multiple_conditions()
     {
-        string expected = "NOT (c == 5 OR (c == 1 AND a != 3))";
+        string expected = "NOT (c = 5 OR (c = 1 AND a != 3))";
 
-        var e = !(t["c"] == 5 | (t["c"] == 1 & t["a"] != 3));
+        var e = !(t["c"] == 5 || (t["c"] == 1 && t["a"] != 3));
 
         Assert.Equal(expected, Generate(e));
     }
@@ -146,14 +146,29 @@ public class ConditionTests
     [Fact]
     public void DeMorgan_composite_test()
     {
-        string expected = "(NOT a == b AND NOT c == d)";
+        string expected = "(NOT a = b AND NOT c = d)";
         var a = t["a"];
 
-        var e = !(a == t["b"]) & !(t["c"] == t["d"]);
+        var e = !(a == t["b"]) && !(t["c"] == t["d"]);
 
         Assert.Equal(expected, Generate(e));
     }
 
+    [Fact]
+    public void OR_operators_do_not_shortcut()
+    {
+        string expected = "(TRUE OR a = b)";
+        var e = true || t["a"] == t["b"];
+        Assert.Equal(expected, Generate(e));
+    }
+
+    [Fact]
+    public void AND_operators_do_not_shortcut()
+    {
+        string expected = "(FALSE AND a = b)";
+        var e = false && t["a"] == t["b"];
+        Assert.Equal(expected, Generate(e));
+    }
 
     private string Generate(IQuery composite)
     {

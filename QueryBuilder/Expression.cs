@@ -12,18 +12,18 @@ public abstract class Expression : IQuery
     public abstract void Generate(IQueryGenerator visitor);
 
     public static Condition operator ==(Expression lhs, Expression rhs) =>
-      new BinaryOperator("==", lhs, rhs);
+      new BinaryOperator("=", lhs, rhs);
     public static Condition operator !=(Expression lhs, Expression rhs) =>
       new BinaryOperator("!=", lhs, rhs);
 
     public static Condition operator ==(object lhs, Expression rhs) =>
-      new BinaryOperator("==", new ValueExpression(lhs), rhs);
+      new BinaryOperator("=", new ValueExpression(lhs), rhs);
 
     public static Condition operator !=(object lhs, Expression rhs) =>
       new BinaryOperator("!=", new ValueExpression(lhs), rhs);
 
     public static Condition operator ==(Expression lhs, object rhs) =>
-      new BinaryOperator("==", lhs, new ValueExpression(rhs));
+      new BinaryOperator("=", lhs, new ValueExpression(rhs));
 
     public static Condition operator !=(Expression lhs, object rhs) =>
       new BinaryOperator("!=", lhs, new ValueExpression(rhs));
