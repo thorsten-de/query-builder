@@ -10,7 +10,7 @@ A humble but hopefully eloquent query builder for C#/.Net. Primary purpose is bu
 
 ## Overview
 
-:::mermaid
+```mermaid
 classDiagram
 
 Query --> Condition: where
@@ -22,4 +22,4 @@ Query *-- LimitDefinition: limit
 
 JoinDefinition --> Condition: on
 
-:::
+```
