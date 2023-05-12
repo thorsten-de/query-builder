@@ -3,13 +3,13 @@ using QueryBuilder.Interfaces;
 
 namespace QueryBuilder.Builder;
 
-public class TestColumnSelector : IColumnSelector
+public class ColumnSelector : IColumnSelector
 {
     public ColumnExpression this[string column, string? table = null] =>
-      new ColumnExpression(column, table);
+        new ColumnExpression(column, table);
 }
 
-public class WhereConditionBuilder : TestColumnSelector, IConditionBuilder
+public class WhereConditionBuilder : ColumnSelector, IConditionBuilder
 {
 
 }

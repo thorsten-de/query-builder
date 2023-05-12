@@ -8,7 +8,7 @@ using static QueryBuilder.Conditions;
 
 public class ConditionTests
 {
-    private IColumnSelector t = new TestColumnSelector();
+    private IColumnSelector t = new ColumnSelector();
     private IQueryGenerator generator = new SimpleSqlGenerator();
 
     [Theory]
