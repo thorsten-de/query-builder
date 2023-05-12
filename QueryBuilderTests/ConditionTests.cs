@@ -1,5 +1,6 @@
 namespace QueryBuilderTests;
 
+using QueryBuilder;
 using QueryBuilder.Interfaces;
 using QueryBuilder.Expressions;
 using QueryBuilder.Builder;
@@ -9,7 +10,6 @@ using static QueryBuilder.Conditions;
 public class ConditionTests
 {
     private IColumnSelector t = new ColumnSelector();
-    private IQueryGenerator generator = new SimpleSqlGenerator();
 
     [Theory]
     [InlineData("AttributeId")]
@@ -49,7 +49,7 @@ public class ConditionTests
     [InlineData(42, "42")]
     public void ValueExpression_returns_itsef_as_string(object value, string expected)
     {
-        var e = new ValueExpression(value);
+        var e = new ValueExpression<object>(value);
         var sql = Generate(e);
         Assert.Equal(expected, sql);
     }
@@ -87,7 +87,7 @@ public class ConditionTests
     public void And_operator_composes_two_conditions()
     {
         string expected = "(5 = t1.col AND 4 != t2.col)";
-        var e = (5 == t["col", "t1"]) && (4 != t["col", "t2"]);
+        var e = 5 == t["col", "t1"] && 4 != t["col", "t2"];
 
         var sql = Generate(e);
         Assert.Equal(expected, sql);
@@ -97,7 +97,7 @@ public class ConditionTests
     public void Or_operator_composes_two_conditions()
     {
         string expected = "(col = 5 OR col != t2.col3)";
-        var e = (t["col"] == 5) || (t["col"] != t["col3", "t2"]);
+        var e = t["col"] == 5 || t["col"] != t["col3", "t2"];
 
         var sql = Generate(e);
         Assert.Equal(expected, sql);
@@ -175,12 +175,26 @@ public class ConditionTests
     {
         string expected = "col IS NULL";
         var e = t["col"].IsNull;
+        Condition e2 = t["test"] == DateTime.Today;
 
         Assert.Equal(expected, Generate(e));
     }
 
+    [Fact]
+    public void In_operator()
+    {
+        int[] numbers = new int[] { 1, 2, 3, 4, 5 };
+        string expected = "col IN (1,2,3,4,5)";
+        var e1 = t["col"].In(1, 2, 3, 4, 5);
+        var e2 = t["col"].In(numbers);
+
+        Assert.Equal(expected, Generate(e1));
+        Assert.Equal(expected, Generate(e2));
+    }
+
     private string Generate(IQuery composite)
     {
+        var generator = new SimpleSqlGenerator();
         composite.Generate(generator);
         return generator.ToString();
     }

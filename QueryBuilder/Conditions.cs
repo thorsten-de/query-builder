@@ -1,5 +1,6 @@
 using QueryBuilder.Interfaces;
 using QueryBuilder.Generators;
+using QueryBuilder.Expressions;
 
 namespace QueryBuilder
 {
@@ -62,6 +63,12 @@ namespace QueryBuilder
 
         public static Condition Predicate(string sqlFragment) =>
             new Predicate(sqlFragment);
+
+        public static Expression Literal<T>(T literal) where T : notnull =>
+            new ValueExpression<T>(literal);
+
+        public static Expression Param<T>(T value, string name = null) =>
+            new ValueExpression<T>(value);
     }
 
     public class Predicate : Condition
@@ -82,7 +89,7 @@ namespace QueryBuilder
     public class ListCondition : Condition
     {
 
-        private readonly IReadOnlyList<Condition> _conditions;
+        private readonly Condition[] _conditions;
 
         public ListCondition(ConditionType op, params Condition[] conditions)
         {
@@ -92,7 +99,7 @@ namespace QueryBuilder
 
         public override void Generate(IQueryGenerator builder)
         {
-            bool hasMultipleConditions = _conditions.Count > 1;
+            bool hasMultipleConditions = _conditions.Length > 1;
 
             if (hasMultipleConditions)
                 builder.Append("(");

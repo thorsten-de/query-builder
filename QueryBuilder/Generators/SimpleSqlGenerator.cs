@@ -45,9 +45,11 @@ public class SimpleSqlGenerator : IQueryGenerator
         return this;
     }
 
-    public IQueryGenerator Join(IEnumerable<IQuery> parts, ConditionType type)
+    public IQueryGenerator Join(IEnumerable<IQuery> parts, ConditionType type) =>
+        Join(parts, separator: _conditionTypes[type]);
+
+    public IQueryGenerator Join(IEnumerable<IQuery> parts, string separator)
     {
-        string separator = _conditionTypes[type];
         foreach (var part in parts)
         {
             part.Generate(this);

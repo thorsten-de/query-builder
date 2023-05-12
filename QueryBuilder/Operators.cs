@@ -39,3 +39,21 @@ public class IsNull : Condition
         builder.Append(Operator.IsNull);
     }
 }
+
+public class In : Condition
+{
+    private readonly Expression _lhs;
+    private readonly IEnumerable<Expression> _expressions;
+
+    public In(Expression lhs, IEnumerable<Expression> expressions)
+    {
+        _lhs = lhs;
+        _expressions = expressions;
+    }
+
+    public override void Generate(IQueryGenerator builder)
+    {
+        _lhs.Generate(builder);
+        builder.Append(Operator.In).Append("(").Join(_expressions, ",").Append(")");
+    }
+}
