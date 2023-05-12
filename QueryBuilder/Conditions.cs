@@ -81,11 +81,6 @@ namespace QueryBuilder
 
     public class ListCondition : Condition
     {
-        private static readonly Dictionary<ConditionType, string> _opNames = new Dictionary<ConditionType, string>
-        {
-            [ConditionType.And] = " AND ",
-            [ConditionType.Or] = " OR "
-        };
 
         private readonly IReadOnlyList<Condition> _conditions;
 
@@ -102,7 +97,7 @@ namespace QueryBuilder
             if (hasMultipleConditions)
                 builder.Append("(");
 
-            builder.Join(_conditions, _opNames[Type]);
+            builder.Join(_conditions, Type);
 
             if (hasMultipleConditions)
                 builder.Append(")");

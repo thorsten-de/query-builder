@@ -10,7 +10,8 @@ public interface IQuery
 public interface IQueryGenerator
 {
     IQueryGenerator Append(object text);
-    IQueryGenerator Join(IEnumerable<IQuery> parts, string separator);
+    IQueryGenerator Append(Operator op);
+    IQueryGenerator Join(IEnumerable<IQuery> parts, ConditionType separator);
 };
 
 public interface IColumnSelector
