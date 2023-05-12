@@ -14,16 +14,18 @@ public enum Operator
     GreaterOrEqual,
     Like,
     Between,
-    Null,
+    IsNull,
     In
 
 }
 
 public abstract class Expression : IQuery
 {
-
     public Condition References(string table, string column = "ID") =>
         this == new ColumnExpression(column, table);
+
+    public Condition IsNull =>
+      new Operators.IsNull(this);
 
     public abstract void Generate(IQueryGenerator visitor);
 

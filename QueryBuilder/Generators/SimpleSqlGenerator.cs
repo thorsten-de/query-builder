@@ -15,7 +15,7 @@ public class SimpleSqlGenerator : IQueryGenerator
         [Operator.LessOrEqual] = " <= ",
         [Operator.In] = " IN ",
         [Operator.Like] = " LIKE ",
-        [Operator.Null] = " IS NULL",
+        [Operator.IsNull] = " IS NULL",
     };
 
     private static readonly Dictionary<ConditionType, string> _conditionTypes = new Dictionary<ConditionType, string>

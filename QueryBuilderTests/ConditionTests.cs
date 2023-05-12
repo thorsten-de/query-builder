@@ -170,6 +170,15 @@ public class ConditionTests
         Assert.Equal(expected, Generate(e));
     }
 
+    [Fact]
+    public void IsNull_operator()
+    {
+        string expected = "col IS NULL";
+        var e = t["col"].IsNull;
+
+        Assert.Equal(expected, Generate(e));
+    }
+
     private string Generate(IQuery composite)
     {
         composite.Generate(generator);

@@ -23,3 +23,19 @@ public class BinaryOperator : Condition
         _rhs.Generate(builder);
     }
 }
+
+public class IsNull : Condition
+{
+    private readonly Expression _expr;
+
+    public IsNull(Expression expr)
+    {
+        _expr = expr;
+    }
+
+    public override void Generate(IQueryGenerator builder)
+    {
+        _expr.Generate(builder);
+        builder.Append(Operator.IsNull);
+    }
+}
