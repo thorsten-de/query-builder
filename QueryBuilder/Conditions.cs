@@ -1,11 +1,21 @@
 using QueryBuilder.Interfaces;
 using QueryBuilder.Generators;
+using QueryBuilder.Expressions;
 
 namespace QueryBuilder
 {
+    public enum ConditionType
+    {
+        And,
+        Or,
+        Not,
+        Predicate
+    }
 
     public abstract class Condition : IQuery
     {
+        public ConditionType Type { get; protected set; } = ConditionType.Predicate;
+
         public static Condition operator &(Condition lhs, Condition rhs) =>
             Conditions.And(lhs, rhs);
 
@@ -21,8 +31,8 @@ namespace QueryBuilder
         public static bool operator true(Condition _cond) => false;
         public static bool operator false(Condition _cond) => false;
 
-        public static Condition True { get; } = new Literal("TRUE");
-        public static Condition False { get; } = new Literal("FALSE");
+        public static Condition True { get; } = Conditions.Predicate("TRUE");
+        public static Condition False { get; } = Conditions.Predicate("FALSE");
 
         public static implicit operator Condition(bool value) => value ? True : False;
 
@@ -37,65 +47,64 @@ namespace QueryBuilder
         }
 
         // Internal class representing condition literals, esp. TRUE and FALSE
-        private class Literal : Condition
-        {
-            private string _literal;
-            public Literal(string Literal)
-            {
-                _literal = Literal;
-            }
 
-            public override void Generate(IQueryGenerator generator)
-            {
-                generator.Append(_literal);
-            }
-
-        }
     }
 
     public static class Conditions
     {
         public static Condition And(params Condition[] conditions) =>
-          new ListCondition(ConditionOperator.And, conditions);
+          new ListCondition(ConditionType.And, conditions);
 
         public static Condition Or(params Condition[] conditions) =>
-          new ListCondition(ConditionOperator.Or, conditions);
+          new ListCondition(ConditionType.Or, conditions);
 
         public static Condition Not(Condition condition) =>
           new NotCondition(condition);
+
+        public static Condition Predicate(string sqlFragment) =>
+            new Predicate(sqlFragment);
+
+        public static Expression Literal<T>(T literal) where T : notnull =>
+            new ValueExpression<T>(literal);
+
+        public static Expression Param<T>(T value, string name = null) =>
+            new ValueExpression<T>(value);
     }
 
-    public enum ConditionOperator
+    public class Predicate : Condition
     {
-        And,
-        Or
+        private string _literal;
+        public Predicate(string Literal)
+        {
+            _literal = Literal;
+        }
+
+        public override void Generate(IQueryGenerator generator)
+        {
+            generator.Append(_literal);
+        }
+
     }
 
     public class ListCondition : Condition
     {
-        private static readonly Dictionary<ConditionOperator, string> _opNames = new Dictionary<ConditionOperator, string>
-        {
-            [ConditionOperator.And] = " AND ",
-            [ConditionOperator.Or] = " OR "
-        };
 
-        private readonly IReadOnlyList<Condition> _conditions;
-        private readonly ConditionOperator _operator;
+        private readonly Condition[] _conditions;
 
-        public ListCondition(ConditionOperator op, params Condition[] conditions)
+        public ListCondition(ConditionType op, params Condition[] conditions)
         {
             _conditions = conditions;
-            _operator = op;
+            Type = op;
         }
 
         public override void Generate(IQueryGenerator builder)
         {
-            bool hasMultipleConditions = _conditions.Count > 1;
+            bool hasMultipleConditions = _conditions.Length > 1;
 
             if (hasMultipleConditions)
                 builder.Append("(");
 
-            builder.Join(_conditions, _opNames[_operator]);
+            builder.Join(_conditions, Type);
 
             if (hasMultipleConditions)
                 builder.Append(")");
@@ -109,6 +118,7 @@ namespace QueryBuilder
         public NotCondition(Condition condition)
         {
             Condition = condition;
+            Type = ConditionType.Not;
         }
 
         public override void Generate(IQueryGenerator builder)

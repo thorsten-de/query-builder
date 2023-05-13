@@ -1,11 +1,11 @@
 namespace QueryBuilder.Expressions;
-using global::QueryBuilder.Interfaces;
+using QueryBuilder.Interfaces;
 
-public class ValueExpression : Expression
+public class ValueExpression<T> : Expression
 {
-    private readonly object _value;
+    private readonly T _value;
 
-    public ValueExpression(object value)
+    public ValueExpression(T value)
     {
         _value = value;
     }
