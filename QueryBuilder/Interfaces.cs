@@ -23,3 +23,12 @@ public interface IColumnSelector
 public interface IConditionBuilder : IColumnSelector
 {
 }
+
+public static class QueryGeneratorExtensions
+{
+    public static IQueryGenerator Generate(this IQueryGenerator generator, IQuery queryable)
+    {
+        queryable.Generate(generator);
+        return generator;
+    }
+}

@@ -33,6 +33,9 @@ public abstract class Expression : IQuery
     public Condition In<T>(IEnumerable<T> values) =>
         new Operators.In(this, values.Select(v => new ValueExpression<T>(v)));
 
+    public Condition Between(Expression from, Expression to) =>
+        new Operators.Between(this, from, to);
+
 
     public abstract void Generate(IQueryGenerator visitor);
 
@@ -43,7 +46,8 @@ public abstract class Expression : IQuery
     public static implicit operator Expression(decimal value) => new ValueExpression<decimal>(value);
     public static implicit operator Expression(float value) => new ValueExpression<float>(value);
     public static implicit operator Expression(double value) => new ValueExpression<double>(value);
-    public static implicit operator Expression(DateTime value) => new ValueExpression<DateTime>(value);
+    public static implicit operator Expression(DateTime value) => new ValueExpression<string>(value.ToString("s", System.Globalization.CultureInfo.InvariantCulture));
+    public static implicit operator Expression(DateOnly value) => new ValueExpression<string>(value.ToString("O", System.Globalization.CultureInfo.InvariantCulture));
 
 
     public static Condition operator ==(Expression lhs, Expression rhs) =>

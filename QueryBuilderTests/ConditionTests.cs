@@ -5,6 +5,7 @@ using QueryBuilder.Interfaces;
 using QueryBuilder.Expressions;
 using QueryBuilder.Builder;
 using QueryBuilder.Generators;
+using QueryBuilder.Operators;
 using static QueryBuilder.Conditions;
 
 public class ConditionTests
@@ -190,6 +191,24 @@ public class ConditionTests
 
         Assert.Equal(expected, Generate(e1));
         Assert.Equal(expected, Generate(e2));
+    }
+
+    [Fact]
+    public void Between_operator()
+    {
+        string expected = "date BETWEEN 2023-02-01 AND 2023-07-31T12:59:34";
+
+        var e = t["date"].Between(new DateOnly(2023, 02, 01), new DateTime(2023, 07, 31, 12, 59, 34));
+        Assert.Equal(expected, Generate(e));
+    }
+
+    [Fact]
+    public void Between_operator_reverse_used()
+    {
+        string expected = "2023-02-01 BETWEEN event.start AND event.end";
+
+        var e = new Between(new DateOnly(2023, 02, 01), t["start", "event"], t["end", "event"]);
+        Assert.Equal(expected, Generate(e));
     }
 
     private string Generate(IQuery composite)

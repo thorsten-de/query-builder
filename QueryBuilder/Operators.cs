@@ -57,3 +57,27 @@ public class In : Condition
         builder.Append(Operator.In).Append("(").Join(_expressions, ",").Append(")");
     }
 }
+
+public class Between : Condition
+{
+    private readonly Expression _lhs;
+    private readonly Expression _from;
+    private readonly Expression _to;
+
+    public Between(Expression lhs, Expression from, Expression to)
+    {
+        _lhs = lhs;
+        _from = from;
+        _to = to;
+    }
+
+    public override void Generate(IQueryGenerator builder)
+    {
+        builder
+            .Generate(_lhs)
+            .Append(" BETWEEN ")
+            .Generate(_from)
+            .Append(" AND ")
+            .Generate(_to);
+    }
+}
