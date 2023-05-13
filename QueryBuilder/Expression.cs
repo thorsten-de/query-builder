@@ -36,6 +36,8 @@ public abstract class Expression : IQuery
     public Condition Between(Expression from, Expression to) =>
         new Operators.Between(this, from, to);
 
+    public Condition Like(string pattern) =>
+        new Operators.Like(this, pattern);
 
     public abstract void Generate(IQueryGenerator visitor);
 

@@ -211,6 +211,16 @@ public class ConditionTests
         Assert.Equal(expected, Generate(e));
     }
 
+    [Fact]
+    public void Like_operator()
+    {
+        string expected = "col LIKE 'prefix%'";
+
+        var e = t["col"].Like("prefix%");
+
+        Assert.Equal(expected, Generate(e));
+    }
+
     private string Generate(IQuery composite)
     {
         var generator = new SimpleSqlGenerator();

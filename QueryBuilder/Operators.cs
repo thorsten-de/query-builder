@@ -81,3 +81,24 @@ public class Between : Condition
             .Generate(_to);
     }
 }
+
+public class Like : Condition
+{
+    private readonly Expression _lhs;
+    private readonly string _pattern;
+
+    public Like(Expression lhs, string pattern)
+    {
+        _lhs = lhs;
+        _pattern = pattern;
+    }
+
+    public override void Generate(IQueryGenerator builder)
+    {
+        builder
+            .Generate(_lhs)
+            .Append(" LIKE '")
+            .Append(_pattern)
+            .Append("'");
+    }
+}
