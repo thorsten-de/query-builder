@@ -54,9 +54,21 @@ public abstract class Expression : IQuery
 
     public static Condition operator ==(Expression lhs, Expression rhs) =>
         new BinaryOperator(Operator.Equal, lhs, rhs);
+
     public static Condition operator !=(Expression lhs, Expression rhs) =>
         new BinaryOperator(Operator.NotEqual, lhs, rhs);
 
-    #endregion
+    public static Condition operator <(Expression lhs, Expression rhs) =>
+        new BinaryOperator(Operator.Less, lhs, rhs);
 
+    public static Condition operator >(Expression lhs, Expression rhs) =>
+        new BinaryOperator(Operator.Greater, lhs, rhs);
+
+    public static Condition operator <=(Expression lhs, Expression rhs) =>
+        new BinaryOperator(Operator.LessOrEqual, lhs, rhs);
+
+    public static Condition operator >=(Expression lhs, Expression rhs) =>
+        new BinaryOperator(Operator.GreaterOrEqual, lhs, rhs);
+
+    #endregion
 }

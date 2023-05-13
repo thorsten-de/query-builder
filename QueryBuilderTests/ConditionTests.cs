@@ -73,6 +73,45 @@ public class ConditionTests
         Assert.Equal(expected, sql);
     }
 
+
+    [Fact]
+    public void Greater_builds_sql_expression()
+    {
+        string expected = "col1 > col2";
+        var e = t["col1"] > t["col2"];
+        var sql = Generate(e);
+        Assert.Equal(expected, sql);
+    }
+
+
+    [Fact]
+    public void GreaterOrEqual_builds_sql_expression()
+    {
+        string expected = "col1 >= col2";
+        var e = t["col1"] >= t["col2"];
+        var sql = Generate(e);
+        Assert.Equal(expected, sql);
+    }
+
+
+    [Fact]
+    public void Less_builds_sql_expression()
+    {
+        string expected = "col1 < col2";
+        var e = t["col1"] < t["col2"];
+        var sql = Generate(e);
+        Assert.Equal(expected, sql);
+    }
+
+    [Fact]
+    public void LessOrEqual_builds_sql_expression()
+    {
+        string expected = "col1 <= col2";
+        var e = t["col1"] <= t["col2"];
+        var sql = Generate(e);
+        Assert.Equal(expected, sql);
+    }
+
     [Fact]
     public void Not_operator_composes_condition()
     {
