@@ -9,7 +9,12 @@ public class ColumnSelector : IColumnSelector
         new ColumnExpression(column, table);
 }
 
-public class WhereConditionBuilder : ColumnSelector, IConditionBuilder
+public class WhereConditionBuilder : ColumnSelector, IWhereConditionBuilder
 {
+    public Condition? Where { get; private set; }
 
+    public WhereConditionBuilder(Condition? baseCondition)
+    {
+        Where = baseCondition;
+    }
 }

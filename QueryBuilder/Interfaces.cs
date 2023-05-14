@@ -24,6 +24,11 @@ public interface IConditionBuilder : IColumnSelector
 {
 }
 
+public interface IWhereConditionBuilder : IConditionBuilder
+{
+    Condition? Where { get; }
+}
+
 public static class QueryGeneratorExtensions
 {
     public static IQueryGenerator Generate(this IQueryGenerator generator, IQuery queryable)

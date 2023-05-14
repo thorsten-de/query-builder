@@ -1,7 +1,8 @@
-﻿using QueryBuilder.Builder;
+﻿using QueryBuilder;
+using QueryBuilder.Builder;
 using QueryBuilder.Extensions;
 
-var builder = new QueryBuilder.Builder.QueryBuilder();
+var builder = new Select();
 
 var t = new ColumnSelector();
 var condition =
@@ -10,13 +11,14 @@ var condition =
 
 Console.WriteLine(condition);
 
-builder
-  .AddColumn("column1", col => col.As("col_name"))
-  .AddColumn("col2")
+var query = builder
+  .Column("column1", col => col.As("col_name"))
+  .Column("col2")
   .Join("table", on: aim =>
       aim["bla"] == aim["test"] & aim["other"] != 3 | 5 == aim["bla"] & !aim.IsActive())
   .Join("comments", on: ari => ari["post_id"].References("post") & ari.IsActive())
   .Where(t =>
-    (t["col1"] == 12 | !(t["col4"] != "bla")) & t.IsActive());
+    t.Where || (t["col1"] == 12 | !(t["col4"] != "bla")) & t.IsActive())
+  .Build();
 
-Console.WriteLine(builder.WhereCondition);
+Console.WriteLine(query);
