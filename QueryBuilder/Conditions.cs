@@ -6,6 +6,7 @@ namespace QueryBuilder
 {
     public enum ConditionType
     {
+        None,
         And,
         Or,
         Not,
@@ -16,10 +17,10 @@ namespace QueryBuilder
     {
         public ConditionType Type { get; protected set; } = ConditionType.Predicate;
 
-        public static Condition operator &(Condition lhs, Condition rhs) =>
+        public static Condition operator &(Condition lhs, Condition? rhs) =>
             Conditions.And(lhs, rhs);
 
-        public static Condition operator |(Condition lhs, Condition rhs) =>
+        public static Condition operator |(Condition lhs, Condition? rhs) =>
             Conditions.Or(lhs, rhs);
 
         public static Condition operator !(Condition condition) =>
@@ -33,6 +34,8 @@ namespace QueryBuilder
 
         public static Condition True { get; } = Conditions.Predicate("TRUE");
         public static Condition False { get; } = Conditions.Predicate("FALSE");
+
+        public static Condition None { get; } = new EmptyCondition();
 
         public static implicit operator Condition(bool value) => value ? True : False;
 
@@ -53,10 +56,10 @@ namespace QueryBuilder
     public static class Conditions
     {
         public static Condition And(params Condition[] conditions) =>
-          new ListCondition(ConditionType.And, conditions);
+          new ListCondition(ConditionType.And, conditions.Where(c => c != Condition.None));
 
         public static Condition Or(params Condition[] conditions) =>
-          new ListCondition(ConditionType.Or, conditions);
+          new ListCondition(ConditionType.Or, conditions.Where(c => c != Condition.None));
 
         public static Condition Not(Condition condition) =>
           new NotCondition(condition);
@@ -89,9 +92,9 @@ namespace QueryBuilder
     public class ListCondition : Condition
     {
 
-        private readonly Condition[] _conditions;
+        private readonly IEnumerable<Condition> _conditions;
 
-        public ListCondition(ConditionType op, params Condition[] conditions)
+        public ListCondition(ConditionType op, IEnumerable<Condition> conditions)
         {
             _conditions = conditions;
             Type = op;
@@ -99,7 +102,7 @@ namespace QueryBuilder
 
         public override void Generate(IQueryGenerator builder)
         {
-            bool hasMultipleConditions = _conditions.Length > 1;
+            bool hasMultipleConditions = _conditions.Count() > 1;
 
             if (hasMultipleConditions)
                 builder.Append("(");
@@ -125,6 +128,17 @@ namespace QueryBuilder
         {
             builder.Append("NOT ");
             Condition.Generate(builder);
+        }
+    }
+
+    public class EmptyCondition : Condition
+    {
+        public EmptyCondition()
+        {
+            Type = ConditionType.None;
+        }
+        public override void Generate(IQueryGenerator generator)
+        {
         }
     }
 }

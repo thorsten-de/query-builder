@@ -11,9 +11,9 @@ public class ColumnSelector : IColumnSelector
 
 public class WhereConditionBuilder : ColumnSelector, IWhereConditionBuilder
 {
-    public Condition? Where { get; private set; }
+    public Condition Where { get; private set; }
 
-    public WhereConditionBuilder(Condition? baseCondition)
+    public WhereConditionBuilder(Condition baseCondition)
     {
         Where = baseCondition;
     }

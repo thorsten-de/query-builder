@@ -4,7 +4,7 @@ using QueryBuilder.Generators;
 
 public class Query : IQuery
 {
-    public Condition? Where { get; set; } = null;
+    public Condition Where { get; set; } = Condition.None;
 
     public void Generate(IQueryGenerator builder)
     {
@@ -12,7 +12,7 @@ public class Query : IQuery
             .Append("SELECT col")
             .Append(" FROM table");
 
-        if (Where is not null)
+        if (Where != Condition.None)
             builder.Append(" WHERE ").Append(Where);
     }
 

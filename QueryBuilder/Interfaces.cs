@@ -26,7 +26,7 @@ public interface IConditionBuilder : IColumnSelector
 
 public interface IWhereConditionBuilder : IConditionBuilder
 {
-    Condition? Where { get; }
+    Condition Where { get; }
 }
 
 public static class QueryGeneratorExtensions

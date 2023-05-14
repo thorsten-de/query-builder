@@ -41,6 +41,18 @@ public class QueryTests
         Assert.Equal(expected, Generate(builder));
     }
 
+    [Fact]
+    public void Query_compose_with_no_base_where()
+    {
+        string expected = "SELECT col FROM table WHERE col < 10";
+
+        var builder = new Select("col")
+            .From("table")
+            .Where(q => q.Where && q["col"] < 10);
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
     private string Generate(Select builder)
     {
         var generator = new SimpleSqlGenerator();
