@@ -53,6 +53,30 @@ public class QueryTests
         Assert.Equal(expected, Generate(builder));
     }
 
+    [Fact]
+    public void Query_defaults_to_star_column()
+    {
+        string expected = "SELECT * FROM table";
+
+        var builder = new Select()
+            .From("table");
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
+    [Fact]
+    public void Query_with_multiple_columns()
+    {
+        string expected = "SELECT c1, c2, c3, c4 FROM table";
+
+        var builder = new Select("c1", "c2")
+            .Column("c3")
+            .Column("c4")
+            .From("table");
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
     private string Generate(Select builder)
     {
         var generator = new SimpleSqlGenerator();

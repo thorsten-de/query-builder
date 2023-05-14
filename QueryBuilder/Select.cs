@@ -11,9 +11,11 @@ public class Select
     public Select(params string[] columnNames)
     {
         _query = new Query();
+        foreach (var col in columnNames)
+            Column(col);
     }
 
-    public Select Column(string name) => this;
+    public Select Column(string name) => BuildColumn(name);
     public Select Column(string columnName, Func<IColumnBuilder, IColumnBuilder> configure) => this;
 
     public Select From(string table, string? @as = null) => this;
@@ -27,4 +29,11 @@ public class Select
     }
 
     public Query Build() => _query;
+
+
+    private Select BuildColumn(string name)
+    {
+        _query.AddColumn(new Column(name));
+        return this;
+    }
 }
