@@ -1,14 +1,15 @@
 namespace QueryBuilder;
 using QueryBuilder.Interfaces;
 using QueryBuilder.Generators;
+using QueryBuilder.Expressions;
 
 public class Query : IQuery
 {
-    private readonly static Column[] _allColumns = new[] { Column.All };
+    private readonly static Expression[] _allColumns = new[] { new ColumnExpression("*") };
 
-    private IList<Column> _columns = new List<Column>();
+    private IList<Expression> _columns = new List<Expression>();
 
-    public IEnumerable<Column> Columns => _columns.Any() ? _columns : _allColumns;
+    public IEnumerable<Expression> Columns => _columns.Any() ? _columns : _allColumns;
 
     public Condition Where { get; set; } = Condition.None;
 
@@ -30,6 +31,6 @@ public class Query : IQuery
         return generator.ToString();
     }
 
-    public void AddColumn(Column col) =>
+    public void AddColumn(Expression col) =>
         _columns.Add(col);
 }

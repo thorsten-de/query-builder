@@ -39,7 +39,14 @@ public abstract class Expression : IQuery
     public Condition Like(string pattern) =>
         new Operators.Like(this, pattern);
 
-    public abstract void Generate(IQueryGenerator visitor);
+
+    public Expression As(string alias) =>
+        new Alias(this, alias);
+
+
+
+
+    public abstract void Generate(IQueryGenerator builder);
 
     #region Operator Overloads
 

@@ -13,8 +13,9 @@ var condition =
 Console.WriteLine(condition);
 
 var query = builder
-  .Column("column1", col => col.As("col_name"))
+  .Column(col => col["col1"].As("col_name"))
   .Column("col2")
+  .Column(c => 12)
   .Join("table", on: aim =>
       aim["bla"] == aim["test"] & aim["other"] != 3 | 5 == aim["bla"] & !aim.IsActive())
   .Join("comments", on: ari => ari["post_id"].References("post") & ari.IsActive())
