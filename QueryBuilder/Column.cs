@@ -16,6 +16,5 @@ public class Column : IQuery
         builder.Append(_name);
     }
 
-
     public static Column All { get; } = new Column("*");
 }

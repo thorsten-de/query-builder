@@ -5,6 +5,7 @@ namespace QueryBuilder.Operators;
 public class BinaryOperator : Condition
 {
     private readonly Expression _lhs;
+
     private readonly Expression _rhs;
 
     private readonly Operator _op;
@@ -85,6 +86,7 @@ public class Between : Condition
 public class Like : Condition
 {
     private readonly Expression _lhs;
+
     private readonly string _pattern;
 
     public Like(Expression lhs, string pattern)

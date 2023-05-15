@@ -17,10 +17,10 @@ namespace QueryBuilder
     {
         public ConditionType Type { get; protected set; } = ConditionType.Predicate;
 
-        public static Condition operator &(Condition lhs, Condition? rhs) =>
+        public static Condition operator &(Condition lhs, Condition rhs) =>
             Conditions.And(lhs, rhs);
 
-        public static Condition operator |(Condition lhs, Condition? rhs) =>
+        public static Condition operator |(Condition lhs, Condition rhs) =>
             Conditions.Or(lhs, rhs);
 
         public static Condition operator !(Condition condition) =>
@@ -48,9 +48,6 @@ namespace QueryBuilder
             Generate(generator);
             return generator.ToString();
         }
-
-        // Internal class representing condition literals, esp. TRUE and FALSE
-
     }
 
     public static class Conditions
@@ -70,7 +67,7 @@ namespace QueryBuilder
         public static Expression Literal<T>(T literal) where T : notnull =>
             new ValueExpression<T>(literal);
 
-        public static Expression Param<T>(T value, string name = null) =>
+        public static Expression Param<T>(T value, string? name = null) =>
             new ValueExpression<T>(value);
     }
 
