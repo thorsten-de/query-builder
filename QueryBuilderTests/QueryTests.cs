@@ -79,11 +79,38 @@ public class QueryTests
         Assert.Equal(expected, Generate(builder));
     }
 
+    [Fact]
+    public void Query_from_multiple_tables()
+    {
+        string expected = "SELECT * FROM table t1, t2, table t3";
+
+        var builder = new Select()
+            .From("table", @as: "t1")
+            .From("t2")
+            .From(t => t["table"].As("t3"));
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
+    [Fact]
+    public void Query_join_test()
+    {
+        string expected = "SELECT * FROM posts p JOIN comments c ON c.post_id = p.id, customers cu JOIN orders o ON o.customer_id = cu.id";
+
+        var builder = new Select()
+            .From(t => t["posts"].As("p")
+                .Join(t["comments"].As("c"), c => c["post_id"].References("p"))
+            )
+            .From("customers", @as: "cu")
+            .Join("orders", "o", o => o["customer_id"].References("cu"));
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
     private string Generate(Select builder)
     {
         var generator = new SimpleSqlGenerator();
         builder.Build().Generate(generator);
         return generator.ToString();
     }
-
 }

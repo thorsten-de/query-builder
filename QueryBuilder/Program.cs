@@ -16,9 +16,9 @@ var query = builder
   .Column(col => col["col1"].As("col_name"))
   .Column("col2")
   .Column(c => 12)
-  .Join("table", on: aim =>
+  .Join("table", "t1", on: aim =>
       aim["bla"] == aim["test"] & aim["other"] != 3 | 5 == aim["bla"] & !aim.IsActive())
-  .Join("comments", on: ari => ari["post_id"].References("post") & ari.IsActive())
+  .Join("comments", "c", on: ari => ari["post_id"].References("post") & ari.IsActive())
   .Where(t =>
     t.Where || (t["col1"] == 12 | !(t["col4"] != "bla")) & t.IsActive())
   .Build();

@@ -21,8 +21,8 @@ public enum Operator
 
 public abstract class Expression : IQuery
 {
-    public Condition References(string table, string column = "ID") =>
-        this == new ColumnExpression(column, table);
+    public Condition References(string table, string column = "id") =>
+        this == new ColumnExpression(table, column);
 
     public Condition IsNull =>
       new Operators.IsNull(this);

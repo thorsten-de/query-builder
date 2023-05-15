@@ -11,6 +11,8 @@ public class Query : IQuery
 
     public IEnumerable<Expression> Columns => _columns.Any() ? _columns : _allColumns;
 
+    public IList<TableSource> From { get; private set; } = new List<TableSource>();
+
     public Condition Where { get; set; } = Condition.None;
 
     public void Generate(IQueryGenerator builder)
@@ -18,7 +20,8 @@ public class Query : IQuery
         builder
             .Append("SELECT ")
             .Join(Columns, ", ")
-            .Append(" FROM table");
+            .Append(" FROM ")
+            .Join(From, ", ");
 
         if (Where != Condition.None)
             builder.Append(" WHERE ").Append(Where);

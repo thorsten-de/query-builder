@@ -23,6 +23,11 @@ public interface IColumnSelector
         => this[null, column];
 }
 
+public interface ITableSelector
+{
+    TableSource this[string table] { get; }
+}
+
 public interface IConditionBuilder : IColumnSelector
 {
 }
@@ -30,6 +35,11 @@ public interface IConditionBuilder : IColumnSelector
 public interface IWhereConditionBuilder : IConditionBuilder
 {
     Condition Where { get; }
+}
+
+public interface IJoinConditionBuilder : IConditionBuilder
+{
+
 }
 
 public static class QueryGeneratorExtensions

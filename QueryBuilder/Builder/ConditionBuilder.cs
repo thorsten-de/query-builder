@@ -9,6 +9,7 @@ public class ColumnSelector : IColumnSelector
         new ColumnExpression(table, column);
 }
 
+
 public class WhereConditionBuilder : ColumnSelector, IWhereConditionBuilder
 {
     public Condition Where { get; private set; }
@@ -17,4 +18,12 @@ public class WhereConditionBuilder : ColumnSelector, IWhereConditionBuilder
     {
         Where = baseCondition;
     }
+}
+
+public class JoinConditionBuilder : IJoinConditionBuilder
+{
+    public required TableSource JoinTable { get; init; }
+
+    public ColumnExpression this[string? table, string column] =>
+        new ColumnExpression(table ?? JoinTable.Identifier, column);
 }
