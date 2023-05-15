@@ -8,7 +8,9 @@ public class ColumnExpression : Expression
     private string? _alias;
     private readonly string _column;
 
-    public ColumnExpression(string column, string? table = null)
+    public ColumnExpression(string column) : this(null, column) { }
+
+    public ColumnExpression(string? table, string column)
     {
         _table = table;
         _column = column;

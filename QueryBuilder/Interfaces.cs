@@ -17,7 +17,10 @@ public interface IQueryGenerator
 
 public interface IColumnSelector
 {
-    ColumnExpression this[string column, string? table = null] { get; }
+    ColumnExpression this[string? table, string column] { get; }
+
+    ColumnExpression this[string column]
+        => this[null, column];
 }
 
 public interface IConditionBuilder : IColumnSelector

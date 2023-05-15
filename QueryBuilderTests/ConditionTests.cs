@@ -32,14 +32,14 @@ public class ConditionTests
     [InlineData("col", null, "col")]
     public void Column_with_name_and_table(string column, string? table, string expected)
     {
-        var e = t[column, table];
+        var e = t[table, column];
         Assert.Equal(expected, Generate(e));
     }
 
     [Fact]
     public void Column_with_name_table_alias()
     {
-        var e = t["col", "table"].As("colAlias");
+        var e = t["table", "col"].As("colAlias");
         var sql = Generate(e);
         Assert.Equal("table.col AS colAlias", sql);
     }
@@ -127,7 +127,7 @@ public class ConditionTests
     public void And_operator_composes_two_conditions()
     {
         string expected = "(5 = t1.col AND 4 != t2.col)";
-        var e = 5 == t["col", "t1"] && 4 != t["col", "t2"];
+        var e = 5 == t["t1", "col"] && 4 != t["t2", "col"];
 
         var sql = Generate(e);
         Assert.Equal(expected, sql);
@@ -137,7 +137,7 @@ public class ConditionTests
     public void Or_operator_composes_two_conditions()
     {
         string expected = "(col = 5 OR col != t2.col3)";
-        var e = t["col"] == 5 || t["col"] != t["col3", "t2"];
+        var e = t["col"] == 5 || t["col"] != t["t2", "col3"];
 
         var sql = Generate(e);
         Assert.Equal(expected, sql);
@@ -246,7 +246,7 @@ public class ConditionTests
     {
         string expected = "2023-02-01 BETWEEN event.start AND event.end";
 
-        var e = new Between(new DateOnly(2023, 02, 01), t["start", "event"], t["end", "event"]);
+        var e = new Between(new DateOnly(2023, 02, 01), t["event", "start"], t["event", "end"]);
         Assert.Equal(expected, Generate(e));
     }
 

@@ -1,12 +1,13 @@
 ﻿using QueryBuilder;
 using QueryBuilder.Builder;
 using QueryBuilder.Extensions;
+using QueryBuilder.Interfaces;
 
 var builder = new Select();
 
-var t = new ColumnSelector();
+IColumnSelector t = new ColumnSelector();
 var condition =
-      t["col1", table: "other"] == t["col2"] && t["col3"] != 3 ||
+      t[table: "other", "col1"] == t["col2"] && t["col3"] != 3 ||
       5 == t["col2"] && t["post_id"].References("post");
 
 Console.WriteLine(condition);

@@ -5,8 +5,8 @@ namespace QueryBuilder.Builder;
 
 public class ColumnSelector : IColumnSelector
 {
-    public ColumnExpression this[string column, string? table = null] =>
-        new ColumnExpression(column, table);
+    public ColumnExpression this[string? table, string column] =>
+        new ColumnExpression(table, column);
 }
 
 public class WhereConditionBuilder : ColumnSelector, IWhereConditionBuilder
