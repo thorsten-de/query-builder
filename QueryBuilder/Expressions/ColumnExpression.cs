@@ -1,11 +1,10 @@
 namespace QueryBuilder.Expressions;
 
-using global::QueryBuilder.Interfaces;
+using QueryBuilder.Interfaces;
 
 public class ColumnExpression : Expression
 {
     private readonly string? _table;
-    private string? _alias;
     private readonly string _column;
 
     public ColumnExpression(string column) : this(null, column) { }
@@ -16,12 +15,6 @@ public class ColumnExpression : Expression
         _column = column;
     }
 
-    public ColumnExpression As(string alias)
-    {
-        _alias = alias;
-        return this;
-    }
-
     public override void Generate(IQueryGenerator builder)
     {
         if (!string.IsNullOrWhiteSpace(_table))
@@ -29,9 +22,24 @@ public class ColumnExpression : Expression
             builder.Append(_table).Append(".");
         }
         builder.Append(_column);
-        if (!string.IsNullOrEmpty(_alias))
-        {
-            builder.Append(" AS ").Append(_alias);
-        }
     }
+}
+
+public class Alias : Expression
+{
+    private readonly Expression _lhs;
+
+    private readonly string _alias;
+
+    public Alias(Expression lhs, string alias)
+    {
+        _lhs = lhs;
+        _alias = alias;
+    }
+
+    public override void Generate(IQueryGenerator builder) =>
+        builder
+            .Generate(_lhs)
+            .Append(" AS ")
+            .Append(_alias);
 }

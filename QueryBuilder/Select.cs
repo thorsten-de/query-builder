@@ -1,6 +1,6 @@
 using QueryBuilder.Interfaces;
 using QueryBuilder.Builder;
-
+using QueryBuilder.Expressions;
 namespace QueryBuilder;
 
 public class Select
@@ -15,8 +15,10 @@ public class Select
             Column(col);
     }
 
-    public Select Column(string name) => BuildColumn(name);
-    public Select Column(string columnName, Func<IColumnBuilder, IColumnBuilder> configure) => this;
+    public Select Column(string name) => BuildColumn(null, name);
+    public Select Column(string table, string name) => BuildColumn(table, name);
+    public Select Column(Func<IColumnSelector, Expression> configure) =>
+        BuildColumn(configure(new ColumnSelector()));
 
     public Select From(string table, string? @as = null) => this;
 
@@ -31,9 +33,11 @@ public class Select
     public Query Build() => _query;
 
 
-    private Select BuildColumn(string name)
+    private Select BuildColumn(string? table, string column) =>
+        BuildColumn(new ColumnExpression(table, column));
+    private Select BuildColumn(Expression column)
     {
-        _query.AddColumn(new Column(name));
+        _query.AddColumn(column);
         return this;
     }
 }

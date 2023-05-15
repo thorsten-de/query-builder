@@ -2,6 +2,7 @@ namespace QueryBuilderTests;
 
 using QueryBuilder;
 using QueryBuilder.Generators;
+using static QueryBuilder.Conditions;
 
 public class QueryTests
 {
@@ -65,13 +66,14 @@ public class QueryTests
     }
 
     [Fact]
-    public void Query_with_multiple_columns()
+    public void Query_with_multiple_columns_and_aliases()
     {
-        string expected = "SELECT c1, c2, c3, c4 FROM table";
+        string expected = "SELECT c1, c2, c3, t1.c4 AS other_column, 12 AS number FROM table";
 
         var builder = new Select("c1", "c2")
             .Column("c3")
-            .Column("c4")
+            .Column(c => c["t1", "c4"].As("other_column"))
+            .Column(c => Literal(12).As("number"))
             .From("table");
 
         Assert.Equal(expected, Generate(builder));
