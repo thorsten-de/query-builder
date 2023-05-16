@@ -95,16 +95,33 @@ public class QueryTests
     [Fact]
     public void Query_join_test()
     {
-        string expected = "SELECT * FROM posts p JOIN comments c ON c.post_id = p.id, customers cu JOIN orders o ON o.customer_id = cu.id";
+        string expected =
+            "SELECT * " +
+            "FROM posts p " +
+                "JOIN comments c ON c.post_id = p.id " +
+                "JOIN authors a ON a.comment_id = c.cID, " +
+            "customers cu " +
+                "JOIN orders o ON o.customer_id = cu.id";
 
         var builder = new Select()
             .From(t => t["posts"].As("p")
-                .Join(t["comments"].As("c"), c => c["post_id"].References("p"))
+                .Join("comments", "c", c => c["post_id"].References("p"))
+                .Join(t["authors"].As("a"), a => a["comment_id"] == a["c", "cID"])
             )
             .From("customers", @as: "cu")
-            .Join("orders", "o", o => o["customer_id"].References("cu"));
+            .Join("orders", @as: "o", on: o => o["customer_id"].References("cu"));
 
         Assert.Equal(expected, Generate(builder));
+    }
+
+    [Fact]
+    public void Join_without_From_throws_exception()
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            new Select()
+                .Join("orders", "o", o => Condition.True);
+        });
     }
 
     private string Generate(Select builder)

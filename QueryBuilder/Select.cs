@@ -33,17 +33,15 @@ public class Select
         BuildFrom(builder(new TableSelector()));
 
 
-    public Select Join(string table, Func<IConditionBuilder, Condition> on) =>
-        Join(new Table(table), on);
-
     public Select Join(string table, string @as, Func<IConditionBuilder, Condition> on) =>
-        Join(new Table(table).As(@as), on);
+        BuildJoin(ts => ts.Join(table, @as, on));
 
-    public Select Join(TableSource rhs, Func<IConditionBuilder, Condition> on)
-    {
-        _query.From[^1] = _query.From[^1].Join(rhs, on);
-        return this;
-    }
+    public Select Join(string table, Func<IConditionBuilder, Condition> on) =>
+        BuildJoin(ts => ts.Join(new Table(table), on));
+
+    public Select Join(TableSource rhs, Func<IConditionBuilder, Condition> on) =>
+        BuildJoin(ts => ts.Join(rhs, on));
+
     public Select Where(Func<IWhereConditionBuilder, Condition> builder)
     {
         _query.Where = builder(new WhereConditionBuilder(_query.Where));
@@ -61,6 +59,15 @@ public class Select
     private Select BuildFrom(TableSource source)
     {
         _query.From.Add(source);
+        return this;
+    }
+
+    private Select BuildJoin(Func<TableSource, TableSource> joiner)
+    {
+        if (!_query.From.Any())
+            throw new InvalidOperationException("There must be a FROM clause before a JOIN.");
+
+        _query.From[^1] = joiner(_query.From[^1]);
         return this;
     }
 

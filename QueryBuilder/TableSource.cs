@@ -5,11 +5,23 @@ namespace QueryBuilder;
 
 public abstract record TableSource : IQuery
 {
-    public TableSource As(string alias) =>
-        new TableAlias(this, alias);
+    public TableSource As(string? alias) =>
+        alias != null
+            ? new TableAlias(this, alias)
+            : this;
 
-    public TableSource Join(TableSource rhs, Func<IJoinConditionBuilder, Condition> builder) =>
-        new Join(this, rhs, builder(new JoinConditionBuilder { JoinTable = rhs }));
+    public TableSource Join(string table, string? @as, Func<IJoinConditionBuilder, Condition> on) =>
+        Join(new Table(table).As(@as), on);
+
+
+    public TableSource Join(string table, string? @as, Condition on) =>
+        Join(new Table(table).As(@as), on);
+
+    public TableSource Join(TableSource rhs, Func<IJoinConditionBuilder, Condition> on) =>
+        Join(rhs, on(new JoinConditionBuilder { JoinTable = rhs }));
+
+    public TableSource Join(TableSource rhs, Condition on) =>
+        new Join(this, rhs, on);
 
     public abstract void Generate(IQueryGenerator builder);
 
