@@ -79,11 +79,72 @@ public class QueryTests
         Assert.Equal(expected, Generate(builder));
     }
 
+    [Fact]
+    public void Query_from_multiple_tables()
+    {
+        string expected = "SELECT * FROM table t1, t2, table t3";
+
+        var builder = new Select()
+            .From("table", @as: "t1")
+            .From("t2")
+            .From(t => t["table"].As("t3"));
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
+    [Fact]
+    public void Query_join_test()
+    {
+        string expected =
+            "SELECT * " +
+            "FROM posts p " +
+                "JOIN authors a ON a.comment_id = c.cID " +
+                "JOIN comments c ON c.post_id = p.id, " +
+            "customers cu " +
+                "JOIN orders o ON o.customer_id = cu.id";
+
+        var builder = new Select()
+            .From(t => t["posts"].As("p")
+                .Join(t["authors"].As("a"), a => a["comment_id"] == a["c", "cID"])
+            )
+            .Join("comments", "c", c => c["post_id"].References("p"))
+            .From("customers", @as: "cu")
+            .Join("orders", @as: "o", on: o => o["customer_id"].References("cu"));
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
+    [Fact]
+    public void Join_without_From_throws_exception()
+    {
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            new Select()
+                .Join("orders", "o", o => Condition.True);
+        });
+    }
+
+    [Theory]
+    [InlineData(JoinType.Default, "JOIN c")]
+    [InlineData(JoinType.Inner, "INNER JOIN c")]
+    [InlineData(JoinType.Right, "RIGHT JOIN c")]
+    [InlineData(JoinType.Left, "LEFT JOIN c")]
+    [InlineData(JoinType.Full, "FULL JOIN c")]
+    public void Join_with_types(JoinType type, string expected)
+    {
+        expected = $"SELECT * FROM o {expected} ON c.c1 = o.id";
+
+        var builder = new Select()
+            .From("o")
+            .Join(type, "c", c => c["c1"].References("o"));
+
+        Assert.Equal(expected, Generate(builder));
+    }
+
     private string Generate(Select builder)
     {
         var generator = new SimpleSqlGenerator();
         builder.Build().Generate(generator);
         return generator.ToString();
     }
-
 }

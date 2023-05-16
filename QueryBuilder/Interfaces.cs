@@ -11,6 +11,7 @@ public interface IQueryGenerator
 {
     IQueryGenerator Append(object text);
     IQueryGenerator Append(Operator op);
+    IQueryGenerator Append(JoinType type);
     IQueryGenerator Join(IEnumerable<IQuery> parts, ConditionType separator);
     IQueryGenerator Join(IEnumerable<IQuery> parts, string separator);
 };
@@ -23,6 +24,11 @@ public interface IColumnSelector
         => this[null, column];
 }
 
+public interface ITableSelector
+{
+    TableSource this[string table] { get; }
+}
+
 public interface IConditionBuilder : IColumnSelector
 {
 }
@@ -30,6 +36,11 @@ public interface IConditionBuilder : IColumnSelector
 public interface IWhereConditionBuilder : IConditionBuilder
 {
     Condition Where { get; }
+}
+
+public interface IJoinConditionBuilder : IConditionBuilder
+{
+
 }
 
 public static class QueryGeneratorExtensions
