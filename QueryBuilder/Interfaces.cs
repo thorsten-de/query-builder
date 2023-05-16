@@ -11,6 +11,7 @@ public interface IQueryGenerator
 {
     IQueryGenerator Append(object text);
     IQueryGenerator Append(Operator op);
+    IQueryGenerator Append(JoinType type);
     IQueryGenerator Join(IEnumerable<IQuery> parts, ConditionType separator);
     IQueryGenerator Join(IEnumerable<IQuery> parts, string separator);
 };

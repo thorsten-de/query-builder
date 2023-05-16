@@ -26,6 +26,15 @@ public class SimpleSqlGenerator : IQueryGenerator
         [ConditionType.Predicate] = ""
     };
 
+    private static readonly Dictionary<JoinType, string> _joinTypes = new Dictionary<JoinType, string>
+    {
+        [JoinType.Default] = "",
+        [JoinType.Inner] = " INNER",
+        [JoinType.Right] = " RIGHT",
+        [JoinType.Left] = " LEFT",
+        [JoinType.Full] = " FULL",
+    };
+
     private readonly StringBuilder builder;
 
     public SimpleSqlGenerator()
@@ -42,6 +51,12 @@ public class SimpleSqlGenerator : IQueryGenerator
     public IQueryGenerator Append(Operator op)
     {
         builder.Append(_operatorNames[op]);
+        return this;
+    }
+
+    public IQueryGenerator Append(JoinType type)
+    {
+        builder.Append(_joinTypes[type]);
         return this;
     }
 

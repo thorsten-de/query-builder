@@ -32,15 +32,22 @@ public class Select
     public Select From(Func<ITableSelector, TableSource> builder) =>
         BuildFrom(builder(new TableSelector()));
 
-
     public Select Join(string table, string @as, Func<IConditionBuilder, Condition> on) =>
-        BuildJoin(ts => ts.Join(table, @as, on));
+        Join(JoinType.Default, table, @as, on);
+    public Select Join(JoinType type, string table, string @as, Func<IConditionBuilder, Condition> on) =>
+        Join(type, new Table(table).As(@as), on);
 
     public Select Join(string table, Func<IConditionBuilder, Condition> on) =>
-        BuildJoin(ts => ts.Join(new Table(table), on));
+        Join(JoinType.Default, table, on);
+
+    public Select Join(JoinType type, string table, Func<IConditionBuilder, Condition> on) =>
+        Join(type, new Table(table), on);
 
     public Select Join(TableSource rhs, Func<IConditionBuilder, Condition> on) =>
-        BuildJoin(ts => ts.Join(rhs, on));
+        Join(JoinType.Default, rhs, on);
+
+    public Select Join(JoinType type, TableSource rhs, Func<IConditionBuilder, Condition> on) =>
+        BuildJoin(ts => ts.Join(rhs, on, type));
 
     public Select Where(Func<IWhereConditionBuilder, Condition> builder)
     {

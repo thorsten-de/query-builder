@@ -98,16 +98,16 @@ public class QueryTests
         string expected =
             "SELECT * " +
             "FROM posts p " +
-                "JOIN comments c ON c.post_id = p.id " +
-                "JOIN authors a ON a.comment_id = c.cID, " +
+                "JOIN authors a ON a.comment_id = c.cID " +
+                "JOIN comments c ON c.post_id = p.id, " +
             "customers cu " +
                 "JOIN orders o ON o.customer_id = cu.id";
 
         var builder = new Select()
             .From(t => t["posts"].As("p")
-                .Join("comments", "c", c => c["post_id"].References("p"))
                 .Join(t["authors"].As("a"), a => a["comment_id"] == a["c", "cID"])
             )
+            .Join("comments", "c", c => c["post_id"].References("p"))
             .From("customers", @as: "cu")
             .Join("orders", @as: "o", on: o => o["customer_id"].References("cu"));
 
@@ -122,6 +122,23 @@ public class QueryTests
             new Select()
                 .Join("orders", "o", o => Condition.True);
         });
+    }
+
+    [Theory]
+    [InlineData(JoinType.Default, "JOIN c")]
+    [InlineData(JoinType.Inner, "INNER JOIN c")]
+    [InlineData(JoinType.Right, "RIGHT JOIN c")]
+    [InlineData(JoinType.Left, "LEFT JOIN c")]
+    [InlineData(JoinType.Full, "FULL JOIN c")]
+    public void Join_with_types(JoinType type, string expected)
+    {
+        expected = $"SELECT * FROM o {expected} ON c.c1 = o.id";
+
+        var builder = new Select()
+            .From("o")
+            .Join(type, "c", c => c["c1"].References("o"));
+
+        Assert.Equal(expected, Generate(builder));
     }
 
     private string Generate(Select builder)

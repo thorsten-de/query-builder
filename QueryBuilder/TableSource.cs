@@ -3,6 +3,15 @@ using QueryBuilder.Builder;
 
 namespace QueryBuilder;
 
+public enum JoinType
+{
+    Default,
+    Inner,
+    Left,
+    Right,
+    Full
+}
+
 public abstract record TableSource : IQuery
 {
     public TableSource As(string? alias) =>
@@ -10,18 +19,11 @@ public abstract record TableSource : IQuery
             ? new TableAlias(this, alias)
             : this;
 
-    public TableSource Join(string table, string? @as, Func<IJoinConditionBuilder, Condition> on) =>
-        Join(new Table(table).As(@as), on);
+    public TableSource Join(TableSource rhs, Func<IJoinConditionBuilder, Condition> on, JoinType type = JoinType.Default) =>
+        Join(rhs, on(new JoinConditionBuilder { JoinTable = rhs }), type);
 
-
-    public TableSource Join(string table, string? @as, Condition on) =>
-        Join(new Table(table).As(@as), on);
-
-    public TableSource Join(TableSource rhs, Func<IJoinConditionBuilder, Condition> on) =>
-        Join(rhs, on(new JoinConditionBuilder { JoinTable = rhs }));
-
-    public TableSource Join(TableSource rhs, Condition on) =>
-        new Join(this, rhs, on);
+    public TableSource Join(TableSource rhs, Condition on, JoinType type = JoinType.Default) =>
+        new Join(this, rhs, on, type);
 
     public abstract void Generate(IQueryGenerator builder);
 
@@ -51,13 +53,14 @@ public record TableAlias(TableSource Source, string Alias) : TableSource
             .Append(Alias);
 }
 
-public record Join(TableSource lhs, TableSource rhs, Condition On) : TableSource
+public record Join(TableSource lhs, TableSource rhs, Condition On, JoinType Type = JoinType.Default) : TableSource
 {
     public override string Identifier => rhs.Identifier;
 
     public override void Generate(IQueryGenerator builder) =>
         builder
             .Generate(lhs)
+            .Append(Type)
             .Append(" JOIN ")
             .Generate(rhs)
             .Append(" ON ")
